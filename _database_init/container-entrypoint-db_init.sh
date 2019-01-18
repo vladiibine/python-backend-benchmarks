@@ -1,4 +1,4 @@
 #!/bin/sh
 
-/app/benchmark_dj/manage.py migrate
+/app/db_init/manage.py migrate
 tail -f /dev/null

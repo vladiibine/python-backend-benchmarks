@@ -24,7 +24,7 @@ class TutorialHandler(BaseHandler):
         self.finish()
 
 
-if __name__ == '__main__' and 1 == 0:
+if __name__ == '__main__':
     parse_command_line()
     application = web.Application([
         (r'/', TutorialHandler)
@@ -45,45 +45,5 @@ if __name__ == '__main__' and 1 == 0:
     future.result()  # raises exception on connection error
 
     http_server = HTTPServer(application)
-    http_server.listen(8000, 'localhost')
+    http_server.listen(8000)
     ioloop.start()
-
-
-import tornado.ioloop
-import tornado.web
-
-
-class MainHandler(tornado.web.RequestHandler):
-    @gen.coroutine
-    def get(self):
-        cur = yield db.execute('SELECT COUNT(*) FROM auth_permission;')
-        result = cur.fetchone()
-        self.write(f"{result[0]}")
-        self.finish()
-
-
-def make_app():
-    return tornado.web.Application([
-        (r"/", MainHandler),
-    ])
-
-
-if __name__ == "__main__":
-    app = make_app()
-
-    ioloop = IOLoop.instance()
-
-    db = momoko.Pool(
-        dsn='dbname=database user=user password=password host=database',
-        size=1,
-        ioloop=ioloop,
-    )
-
-    # this is a one way to run ioloop in sync
-    future = db.connect()
-    ioloop.add_future(future, lambda f: ioloop.stop())
-    ioloop.start()
-    future.result()  # raises exception on connection error
-
-    app.listen(8000)
-    tornado.ioloop.IOLoop.current().start()
