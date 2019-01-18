@@ -12,7 +12,7 @@ services:
 #    command: manage.py migrate && manage.py runserver 0:8000
 #    command: ls -alhF
     command: /app/container-entrypoint.sh
-#    working_dir: /app/benchmark_dj/
+    working_dir: /app/benchmark_dj/
     env_file:
       - .env
 #    volumes:
