@@ -5,7 +5,7 @@ RUN apk update \
   && apk add --virtual build-deps gcc python3-dev musl-dev \
   && apk add postgresql-dev
 
-COPY ./requirements.txt /app/requirements.txt
+COPY requirements_dj.txt /app/requirements.txt
 RUN pip install -r /app/requirements.txt
 
 COPY . /app
