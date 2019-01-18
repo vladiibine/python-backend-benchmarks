@@ -1,0 +1,23 @@
+version: '2'
+
+services:
+  database:
+    image: postgres:10.4
+    env_file:
+      - .env
+    container_name: database-container-benchmarx
+
+  benchmark_dj:
+    build: .
+#    command: manage.py migrate && manage.py runserver 0:8000
+#    command: ls -alhF
+    command: /app/container-entrypoint.sh
+#    working_dir: /app/benchmark_dj/
+    env_file:
+      - .env
+#    volumes:
+#      - .:/code
+    ports:
+      - "8000:8000"
+    depends_on:
+      - database
