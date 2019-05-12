@@ -1,5 +1,6 @@
 import os
 import subprocess
+from collections import defaultdict
 
 Q_10_serial = "/10q/"
 Q_1_serial = "/1q/"
@@ -45,6 +46,26 @@ def main():
     # concurrency_levels = [1, 5, 10, 20, 50, 100, 1000]
     # test_time = [10]
 
+    # {
+    #     duration: {
+    #         "app_name": {
+    #             concurrency_level: {
+    #                 "endpoint": {
+    #                     "requests_per_second": X,
+    #                 }
+    #             }
+    #         }
+    #     }
+    # }
+    benchmark_results = \
+        defaultdict(  # duration ->
+            lambda: defaultdict(  # app_name ->
+                lambda: defaultdict(  # concurrency_level ->
+                    lambda: defaultdict  # requests_per_second ->
+                )
+            )
+        )
+
     for test in TEST_SPECS:  # type: TestSpec
         for duration in test.durations:
             for concurrency in test.concurrency_levels:
@@ -52,20 +73,46 @@ def main():
                     for endpoint in DEFAULT_ENDPOINTS:
                         if endpoint in app.endpoints:
 
-                            proc = subprocess.Popen([
-                                "ab",
-                                f"-c{concurrency}"
-                                f"-t{duration}"
-                                ""
-                            ], stdout=subprocess.PIPE, shell=True)
+                            benchmark_results[duration][app.name][concurrency]["requests_per_second"] = \
+                                benchmark_endpoint(
+                                    endpoint,
+                                    app.port,
+                                    concurrency,
+                                    duration
+                                )
 
-                            out, err = proc.communicate()
+
+def benchmark_endpoint(url_path, port, concurrency, duration):
+    proc = subprocess.Popen([
+        "ab",
+        "-c", "{}".format(concurrency),
+        "-t", "{}".format(duration),
+        "http://localhost:{}{}".format(port, url_path)
+    ], stdout=subprocess.PIPE)
+
+    # Relevant line:
+    # Requests per second:    53.62 [#/sec] (mean)
+    out, err = proc.communicate()
+    req_per_sec = out.decode('utf-8').splitlines()[20].split()[3]
+    return float(req_per_sec)
+
 
 def test_endpoint_is_up(url):
-    import requests
-    response = requests.get(url)
+    try:
+        # py3
+        import urllib.request
 
-    return response.status == 200
+        resp = urllib.request.urlopen(url)
+        return resp.status == 200
+
+    except ImportError:
+        # py2
+        import urllib
+
+        resp = urllib.urlopen(url)
+
+        return resp.getcode() == 200
+
 
 
 
