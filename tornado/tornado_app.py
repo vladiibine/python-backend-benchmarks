@@ -16,7 +16,7 @@ class BaseHandler(web.RequestHandler):
         return self.application.db
 
 
-class TutorialHandler(BaseHandler):
+class OneQueryHandler(BaseHandler):
     @gen.coroutine
     def get(self):
         # self.write('Some text here!')
@@ -26,12 +26,28 @@ class TutorialHandler(BaseHandler):
         self.write(f"{result[0]}")
         self.finish()
 
+class TenQueriesSerialHandler(BaseHandler):
+    @gen.coroutine
+    def get(self):
+        # self.write('Some text here!')
+        counter = 0
+
+        for _ in range(10):
+            cur = yield self.db.execute('SELECT COUNT(*) FROM auth_permission;')
+            result = cur.fetchone()
+            counter += result
+            cur.close()
+
+        self.write(f"{counter[0]}")
+        self.finish()
+
 
 if __name__ == '__main__':
     parse_command_line()
     application = web.Application([
-        (r'/1q/', TutorialHandler)
-    ], debug=True)
+        (r'/1q/', OneQueryHandler),
+        (r'/10q/', TenQueriesSerialHandler),
+    ])
 
     ioloop = IOLoop.instance()
     database = os.environ['POSTGRES_DB']

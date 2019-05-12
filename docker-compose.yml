@@ -15,9 +15,7 @@ services:
     build: _database_init
     command: /app/container-entrypoint-db_init.sh
     depends_on:
-      database:
-        condition: service_healthy
-
+      - database
 
 
   benchmark_dj:
