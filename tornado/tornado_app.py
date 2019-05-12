@@ -1,3 +1,5 @@
+import os
+
 from tornado import gen
 from tornado.ioloop import IOLoop
 from tornado.httpserver import HTTPServer
@@ -20,6 +22,7 @@ class TutorialHandler(BaseHandler):
         # self.write('Some text here!')
         cur = yield self.db.execute('SELECT COUNT(*) FROM auth_permission;')
         result = cur.fetchone()
+        cur.close()
         self.write(f"{result[0]}")
         self.finish()
 
@@ -27,13 +30,18 @@ class TutorialHandler(BaseHandler):
 if __name__ == '__main__':
     parse_command_line()
     application = web.Application([
-        (r'/', TutorialHandler)
+        (r'/1q/', TutorialHandler)
     ], debug=True)
 
     ioloop = IOLoop.instance()
+    database = os.environ['POSTGRES_DB']
+    user = os.environ['POSTGRES_USER']
+    password = os.environ['POSTGRES_PASSWORD']
+    host = os.environ['POSTGRES_HOST']
 
     application.db = momoko.Pool(
-        dsn='dbname=database user=user password=password host=database',
+        dsn='dbname={} user={} password={} host={}'
+            .format(database, user, password, host),
         size=1,
         ioloop=ioloop,
     )
