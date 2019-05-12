@@ -1,9 +1,6 @@
-import os
 import subprocess
 from collections import defaultdict
 
-Q_10_serial = "/10q/"
-Q_1_serial = "/1q/"
 
 class AppSpec(object):
     def __init__(self, name, port, supported_endpoints):
@@ -16,15 +13,19 @@ class AppSpec(object):
         self.port = port
         self.endpoints = supported_endpoints
 
+
 class TestSpec(object):
     def __init__(self, durations, concurrency_levels):
         """
-
         :param list[int] durations: how many seconds should the tests last
         :param list[int] concurrency_levels: what concurrency levels to use
         """
         self.durations = durations
         self.concurrency_levels = concurrency_levels
+
+
+Q_10_serial = "/10q/"
+Q_1_serial = "/1q/"
 
 DEFAULT_ENDPOINTS = [
     Q_1_serial,
@@ -33,7 +34,7 @@ DEFAULT_ENDPOINTS = [
 
 APP_SPECS = [
     AppSpec("django", 9001, DEFAULT_ENDPOINTS),
-    AppSpec("tornado", 9002, DEFAULT_ENDPOINTS),
+    AppSpec("tornado 1 db conn", 9002, DEFAULT_ENDPOINTS),
     AppSpec("flask", 9003, DEFAULT_ENDPOINTS),
 ]
 
@@ -73,7 +74,8 @@ def main():
                     for endpoint in DEFAULT_ENDPOINTS:
                         if endpoint in app.endpoints:
 
-                            benchmark_results[duration][app.name][concurrency]["requests_per_second"] = \
+                            benchmark_results[duration][app.name][concurrency][
+                                "requests_per_second"] = \
                                 benchmark_endpoint(
                                     endpoint,
                                     app.port,
@@ -112,9 +114,6 @@ def test_endpoint_is_up(url):
         resp = urllib.urlopen(url)
 
         return resp.getcode() == 200
-
-
-
 
 
 if __name__ == '__main__':
