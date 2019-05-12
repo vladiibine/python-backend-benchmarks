@@ -19,6 +19,6 @@ from django.urls import path
 from bm_dj.views import test_view
 
 urlpatterns = [
-    path('', test_view),
-    path('admin/', admin.site.urls),
+    path('1q/', test_view),
+    # path('admin/', admin.site.urls),
 ]
