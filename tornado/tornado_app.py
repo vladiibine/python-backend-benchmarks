@@ -6,7 +6,6 @@ from tornado.httpserver import HTTPServer
 from tornado.options import parse_command_line
 from tornado import web
 
-import psycopg2
 import momoko
 
 
@@ -19,26 +18,25 @@ class BaseHandler(web.RequestHandler):
 class OneQueryHandler(BaseHandler):
     @gen.coroutine
     def get(self):
-        # self.write('Some text here!')
         cur = yield self.db.execute('SELECT COUNT(*) FROM auth_permission;')
         result = cur.fetchone()
         cur.close()
         self.write(f"{result[0]}")
         self.finish()
 
+
 class TenQueriesSerialHandler(BaseHandler):
     @gen.coroutine
     def get(self):
-        # self.write('Some text here!')
         counter = 0
 
         for _ in range(10):
             cur = yield self.db.execute('SELECT COUNT(*) FROM auth_permission;')
             result = cur.fetchone()
-            counter += result
+            counter += result[0]
             cur.close()
 
-        self.write(f"{counter[0]}")
+        self.write(f"{counter}")
         self.finish()
 
 
