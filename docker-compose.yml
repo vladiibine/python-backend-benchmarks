@@ -16,6 +16,8 @@ services:
     command: /app/container-entrypoint-db_init.sh
     depends_on:
       - database
+    env_file:
+      - .env
 
 
   benchmark_dj:
@@ -50,6 +52,17 @@ services:
       - "9003:8000"
     depends_on:
       - database_init
+
+  benchmark_fastapi_sqlalchemy_async:
+    build: fastapi-sqlalchemy-async
+    command: /app/container-entrypoint-fastapi-sqlalchemy-async.sh
+    env_file:
+      - .env
+    ports:
+      - "9004:8000"
+    depends_on:
+      - database_init
+
 
 
 

@@ -36,17 +36,15 @@ APP_SPECS = [
     AppSpec("django", 9001, DEFAULT_ENDPOINTS),
     AppSpec("tornado 1 db conn", 9002, DEFAULT_ENDPOINTS),
     AppSpec("flask", 9003, DEFAULT_ENDPOINTS),
+    AppSpec("fastapi-sqlalchemy-async", 9004, DEFAULT_ENDPOINTS),
 ]
 
 TEST_SPECS = [
-    TestSpec([10], [1, 2, 5, 10, 20, 50, 100])
+    TestSpec([10], [1, 10, 100]),
 ]
 
 
 def main():
-    # concurrency_levels = [1, 5, 10, 20, 50, 100, 1000]
-    # test_time = [10]
-
     # {
     #     duration: {
     #         "app_name": {
@@ -62,7 +60,7 @@ def main():
         defaultdict(  # duration ->
             lambda: defaultdict(  # app_name ->
                 lambda: defaultdict(  # concurrency_level ->
-                    lambda: defaultdict  # requests_per_second ->
+                    lambda: {}  # requests_per_second ->
                 )
             )
         )
@@ -73,7 +71,15 @@ def main():
                 for app in APP_SPECS:  # type: AppSpec
                     for endpoint in DEFAULT_ENDPOINTS:
                         if endpoint in app.endpoints:
-
+                            print(
+                                "Running benchmark for {app} {endpoint} concurrency={concurrency} duration={duration}"
+                                .format(
+                                    app=app.name,
+                                    endpoint=endpoint,
+                                    concurrency=concurrency,
+                                    duration=duration,
+                                )
+                            )
                             benchmark_results[duration][app.name][concurrency][
                                 "requests_per_second"] = \
                                 benchmark_endpoint(
@@ -82,6 +88,7 @@ def main():
                                     concurrency,
                                     duration
                                 )
+                            print()
 
 
 def benchmark_endpoint(url_path, port, concurrency, duration):
@@ -95,7 +102,11 @@ def benchmark_endpoint(url_path, port, concurrency, duration):
     # Relevant line:
     # Requests per second:    53.62 [#/sec] (mean)
     out, err = proc.communicate()
-    req_per_sec = out.decode('utf-8').splitlines()[20].split()[3]
+    req_per_sec = [
+        line
+        for line in out.decode('utf-8').splitlines()
+        if 'requests per second' in line.lower()
+    ][0].split()[3]
     return float(req_per_sec)
 
 
