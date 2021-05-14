@@ -13,6 +13,8 @@ from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql.expression import func
+from sqlalchemy import select
+
 
 DB_DATABASE = os.environ['POSTGRES_DB']
 DB_USER = os.environ['POSTGRES_USER']
@@ -29,7 +31,7 @@ Base = declarative_base()
 
 
 class Permission(Base):
-    __tablename__ = "auth_permissions"
+    __tablename__ = "auth_permission"
     id = Column(Integer, primary_key=True)
 
 
@@ -52,9 +54,9 @@ app = FastAPI(
 )
 
 
-@app.on_event("startup")
-async def startup():
-    await engine.connect()
+# @app.on_event("startup")
+# async def startup():
+#     await engine.connect()
 
 
 @app.on_event("shutdown")
@@ -63,22 +65,21 @@ async def shutdown():
 
 
 @app.get("/1q/", status_code=status.HTTP_200_OK)
-async def create_item(vat):
+async def create_item():
     async with AsyncSessionLocal() as session:
-        # async with session.begin():
-        result = await session.query(Permission).with_entities(func.count()).scalar()
+        result = await session.execute(select(func.count('*')).select_from(Permission))
 
-    return result[0]
+    return list(result)[0][0]
 
 
 @app.get("/10q/", status_code=status.HTTP_200_OK)
-async def create_item(vat):
+async def create_item():
     async with AsyncSessionLocal() as session:
         # async with session.begin():
         counter = 0
         for _ in range(10):
-            result = await session.query(Permission).with_entities(func.count()).scalar()
+            result = await session.execute(select(func.count('*')).select_from(Permission))
 
-            counter += result
+            counter += list(result)[0][0]
 
     return str(counter)

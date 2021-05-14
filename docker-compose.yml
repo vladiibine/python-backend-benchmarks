@@ -20,38 +20,38 @@ services:
       - .env
 
 
-  benchmark_dj:
-    build: django
-    command: /app/container-entrypoint-django.sh
-    working_dir: /app/benchmark_dj/
-    env_file:
-      - .env
-    ports:
-      - "9001:8000"
-    depends_on:
-      - database_init
+#  benchmark_dj:
+#    build: django
+#    command: /app/container-entrypoint-django.sh
+#    working_dir: /app/benchmark_dj/
+#    env_file:
+#      - .env
+#    ports:
+#      - "9001:8000"
+#    depends_on:
+#      - database_init
 
 
-  benchmark_tornado:
-    build: tornado
-    command: /app/container-entrypoint-tornado.sh
-    env_file:
-      - .env
-    ports:
-      - "9002:8000"
-    depends_on:
-      - database_init
+#  benchmark_tornado:
+#    build: tornado
+#    command: /app/container-entrypoint-tornado.sh
+#    env_file:
+#      - .env
+#    ports:
+#      - "9002:8000"
+#    depends_on:
+#      - database_init
 
 
-  benchmark_flask:
-    build: flask
-    command: /app/container-entrypoint-flask.sh
-    env_file:
-      - .env
-    ports:
-      - "9003:8000"
-    depends_on:
-      - database_init
+#  benchmark_flask:
+#    build: flask
+#    command: /app/container-entrypoint-flask.sh
+#    env_file:
+#      - .env
+#    ports:
+#      - "9003:8000"
+#    depends_on:
+#      - database_init
 
   benchmark_fastapi_sqlalchemy_async:
     build: fastapi-sqlalchemy-async
