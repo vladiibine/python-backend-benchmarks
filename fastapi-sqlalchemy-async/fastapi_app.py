@@ -65,7 +65,7 @@ async def shutdown():
 
 
 @app.get("/1q/", status_code=status.HTTP_200_OK)
-async def create_item():
+async def handler1():
     async with AsyncSessionLocal() as session:
         result = await session.execute(select(func.count('*')).select_from(Permission))
 
@@ -73,7 +73,7 @@ async def create_item():
 
 
 @app.get("/10q/", status_code=status.HTTP_200_OK)
-async def create_item():
+async def handler2():
     async with AsyncSessionLocal() as session:
         # async with session.begin():
         counter = 0
