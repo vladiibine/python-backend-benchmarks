@@ -18,6 +18,7 @@ from django.urls import path
 from bm_dj import views
 
 urlpatterns = [
+    path('0q/', views.zero_queries_view),
     path('1q/', views.one_query_view),
     path('10q/', views.ten_queries_view),
 ]

@@ -17,6 +17,11 @@ connection = connect(dsn=dsn)
 logging.getLogger("web").handlers = []
 
 
+@app.route('/0q/')
+def zero_queries():
+    return "Hello world"
+
+
 @app.route("/1q/")
 def one_query_sequential():
 

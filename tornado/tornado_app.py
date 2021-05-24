@@ -15,6 +15,13 @@ class BaseHandler(web.RequestHandler):
         return self.application.db
 
 
+class ZeroQueryHandler(BaseHandler):
+    @gen.coroutine
+    def get(self):
+        self.write(f"Hello world")
+        self.finish()
+
+
 class OneQueryHandler(BaseHandler):
     @gen.coroutine
     def get(self):
@@ -43,6 +50,7 @@ class TenQueriesSerialHandler(BaseHandler):
 if __name__ == '__main__':
     parse_command_line()
     application = web.Application([
+        (r'/0q/', ZeroQueryHandler),
         (r'/1q/', OneQueryHandler),
         (r'/10q/', TenQueriesSerialHandler),
     ])

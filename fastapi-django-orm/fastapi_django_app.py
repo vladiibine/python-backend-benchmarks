@@ -13,8 +13,6 @@ from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql.expression import func
-from sqlalchemy import select
-
 
 DB_DATABASE = os.environ['POSTGRES_DB']
 DB_USER = os.environ['POSTGRES_USER']
@@ -31,13 +29,13 @@ Base = declarative_base()
 
 
 class Permission(Base):
-    __tablename__ = "auth_permission"
+    __tablename__ = "auth_permissions"
     id = Column(Integer, primary_key=True)
 
 
 engine = create_async_engine(
         DATABASE_URL,
-        # echo=True,
+        echo=True,
     )
 
 AsyncSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine, class_=AsyncSession)
@@ -48,7 +46,10 @@ class ApiCompany(BaseModel):
     description: str
 
 
-app = FastAPI(name="app", description="blabla")
+app = FastAPI(
+    name="VAT Searcher",
+    description="Facade for accessing company data by VAT.",
+)
 
 
 # @app.on_event("startup")
@@ -61,27 +62,23 @@ async def shutdown():
     await engine.disconnect()
 
 
-@app.get('/0q/')
-async def handler():
-    return "Hello world"
-
-
 @app.get("/1q/", status_code=status.HTTP_200_OK)
-async def handler1():
+async def handle1():
     async with AsyncSessionLocal() as session:
-        result = await session.execute(select(func.count('*')).select_from(Permission))
+        # async with session.begin():
+        result = await session.query(Permission).with_entities(func.count()).scalar()
 
-    return list(result)[0][0]
+    return result[0]
 
 
 @app.get("/10q/", status_code=status.HTTP_200_OK)
-async def handler2():
+async def handle2():
     async with AsyncSessionLocal() as session:
         # async with session.begin():
         counter = 0
         for _ in range(10):
-            result = await session.execute(select(func.count('*')).select_from(Permission))
+            result = await session.query(Permission).with_entities(func.count()).scalar()
 
-            counter += list(result)[0][0]
+            counter += result
 
     return str(counter)
