@@ -6,7 +6,7 @@ authors = ["Vlad Ardelean <vlad.george.ardelean@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-fastapi = "^0.65.1"
+fastapi = "^0.65.2"
 SQLAlchemy = "1.4.15"
 uvicorn = "0.13.4"
 psycopg2-binary = "^2.8.6"
